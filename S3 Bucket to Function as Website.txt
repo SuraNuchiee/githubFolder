@@ -1,0 +1,13 @@
+S3 Bucket to Function as Website
+	List existing buckets: aws s3api list-buckets
+	Create a new S3 bucket: aws s3api create-bucket --bucket [BucketName] --region us-west-2 --create-bucket-configuration LocationConstraint=us-west-2
+
+	Create a new IAM user: aws iam create-user --user-name [Username]
+	Create a login profile: aws iam create-login-profile --user-name [Username] --password [Password]
+	Find IAM policy: aws iam list-policies --query "Policies[?contains(PolicyName,'S3')]"
+	Attach Policy:aws iam attach-user-policy --policy-arn arn:aws:iam::aws:policy/[PolicyName] --user-name [Username]
+
+	Function Bucket as Website: aws s3 website s3://[BucketName]/ --index-document index.html
+	Upload file to bucket: aws s3 cp [Absolute-Path-to-ArchiveFile] s3://[BucketName]/ --recursive --acl public-read
+			     : aws s3 sync /home/ec2-user/sysops-activity-files/static-website/ s3://[BucketName]/ --acl public-read 
+	Verify if file were uploaded: aws s3 ls [BucketName]
