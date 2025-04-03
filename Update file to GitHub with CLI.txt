@@ -1,0 +1,7 @@
+Update file to GitHub with CLI
+
+Login: git init
+Check status: git status
+Add file: git add [FileName.ex]
+Commit file: git commit -m "Comment"
+Push file: git push -u origin [branchName]
