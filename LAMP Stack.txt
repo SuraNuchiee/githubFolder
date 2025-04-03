@@ -1,0 +1,12 @@
+LAMP Stack
+
+To set up the AWS CLI profile with credentials: aws configure
+Creating an EC2 LAMP instance by using the AWS CLI
+	Observe the script details	: cd ~/sysops-activity-files/starters
+				  	: cp create-lamp-instance-v2.sh create-lamp-instance.backup
+					: cat create-lamp-instance-userdata-v2.txt
+					: ./create-lamp-instance-v2.sh
+	sudo yum install -y nmap
+Detecting Firewalls and Intrusion Detection Systems (IDS): nmap -Pn <public-ip>
+
+Test whether the user data script ran: sudo tail -f /var/log/cloud-init-output.log

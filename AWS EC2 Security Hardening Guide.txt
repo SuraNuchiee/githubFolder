@@ -1,0 +1,105 @@
+AWS EC2 Security Hardening Guide
+
+Task 5.1: Check the OS Users
+
+	Step 1: Check Recent Logins
+
+Run the following command to see who has recently logged into the system:
+
+	sudo aureport --auth
+
+sudo: Runs the command with superuser privileges.
+aureport --auth: Displays authentication logs.
+
+	Step 2: Check Currently Logged-in Users
+
+	who
+
+Displays a list of currently logged-in users.
+
+	Step 3: Attempt to Remove the Unauthorized User
+
+	sudo userdel -r chaos-user
+
+userdel: Deletes the user.
+-r: Removes the user’s home directory and mail.
+
+If the user is logged in, the command will fail and return a process ID (PID).
+
+	Step 4: Kill the Process (Force Logout)
+
+	sudo kill -9 ProcNum
+
+kill -9: Forcefully terminates the process.
+ProcNum: Replace this with the actual PID from the previous step.
+
+	Step 5: Verify the Unauthorized User is Gone
+
+	who
+
+The chaos-user should no longer appear in the output.
+
+	Step 6: Delete the User Again
+
+	sudo userdel -r chaos-user
+
+Now, this command should succeed.
+
+	Step 7: Verify No Other Suspicious OS Users
+
+	sudo cat /etc/passwd | grep -v nologin
+
+cat /etc/passwd: Displays system users.
+grep -v nologin: Filters out service accounts that cannot log in.
+
+Standard users like root, sync, shutdown, and halt should remain.
+
+
+Task 5.2: Update SSH Security
+
+	Step 1: Check the SSH Configuration File
+
+	sudo ls -l /etc/ssh/sshd_config
+
+Lists the file details, including its last modified date.
+
+	Step 2: Edit the SSH Configuration File
+
+	sudo vi /etc/ssh/sshd_config
+
+Opens the file in the vi editor.
+
+	Step 3: Enable Line Numbering in vi
+
+	:set number
+
+Displays line numbers for easier navigation.
+
+	Step 4: Disable Password Authentication
+Locate: PasswordAuthentication yes
+Press a to enter edit mode and change it to: #PasswordAuthentication yes
+
+	Step 5: Enable Key-Based Authentication
+Locate: #PasswordAuthentication no
+Remove the # to uncomment it: PasswordAuthentication no
+
+This ensures only SSH key-based logins are allowed.
+
+	Step 6: Save Changes and Exit vi
+
+	:wq
+
+	Step 7: Restart the SSH Service
+
+	sudo service sshd restart
+
+Restarts the SSH daemon to apply the new security settings.
+
+Summary
+
+✅ Removed an unauthorized user from the system.
+✅ Investigated their access method.
+✅ Secured SSH by disabling password authentication.
+✅ Restarted the SSH service to enforce security changes.
+
+This guide ensures better security practices for your EC2 instance. 🚀

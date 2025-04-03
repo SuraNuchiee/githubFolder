@@ -1,0 +1,31 @@
+Troubleshooting a VPC
+
+1. Creating VPC Flow Logs
+	create the S3 bucket: aws s3api create-bucket --bucket flowlog(6 number) --region 'us-west-2' --create-bucket-configuration LocationConstraint='us-west-2'
+	get the VPC ID for VPC1 to create VPC Flow Logs: aws ec2 describe-vpcs --query 'Vpcs[*].[VpcId,Tags[?Key==`Name`].Value,CidrBlock]' --filters "Name=tag:Name,Values='VPC1'"
+	create VPC Flow Logs on VPC1: aws ec2 create-flow-logs --resource-type VPC --resource-ids <vpc-id> --traffic-type ALL --log-destination-type s3 --log-destination arn:aws:s3:::<flowlog######>
+	confirm that the flow log was created: aws ec2 describe-flow-logs
+2. 
+	find details about the instance: aws ec2 describe-instances --filter "Name=ip-address,Values='<InstanceIP>'"
+	To filter the results: aws ec2 describe-instances --filter "Name=ip-address,Values='<InstanceIP>'" --query 'Reservations[*].Instances[*].[State,PrivateIpAddress,InstanceId,SecurityGroups,SubnetId,KeyName]'
+
+
+Analyzing flow logs
+
+1. Downloading and extracting flow logs
+	download the flow logs: aws s3 cp s3://<flowlogNumber>/ . --recursive
+	To reach the required subdirectory: cd <AWSLogs/AccountID/vpcflowlogs/us-west-2/yyyy/mm/dd/>
+	extract the logs: gunzip *.gz
+2. Analyzing the logs
+	header row indicates the kind of data that each log entry contains: head <file name>
+	search each log file in the current directory: grep -rn REJECT .
+	To find out how many records were returned: grep -rn REJECT . | wc -l
+	Looking for only lines that contain 22: grep -rn 22 . | grep REJECT
+	 
+	
+
+	
+	
+
+
+

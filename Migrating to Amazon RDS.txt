@@ -1,0 +1,48 @@
+Migrating to Amazon RDS
+-Creating an Amazon RDS instance by using the AWS CLI
+	1) Configuring the AWS CLI: aws configure
+	2) Creating prerequisite components
+	-create the security group: aws ec2 create-security-group \
+				--group-name CafeDatabaseSG \
+				--description "Security group for Cafe database" \
+				--vpc-id <CafeInstance VPC ID>
+	-create the inbound rule: aws ec2 authorize-security-group-ingress \
+				--group-id <CafeDatabaseSG Group ID> \
+				--protocol tcp --port 3306 \
+				--source-group <CafeSecurityGroup Group ID>
+	-create the 2 subnet in different AZ: aws ec2 create-subnet \
+				--vpc-id <CafeInstance VPC ID> \
+				--cidr-block 10.200.2.0/23 \
+				--availability-zone <CafeInstance Availability Zone>
+-Creating the Amazon RDS MariaDB instance: aws rds create-db-instance \
+			--db-instance-identifier CafeDBInstance \
+			--engine mariadb \
+			--engine-version 10.5.13 \
+			--db-instance-class db.t3.micro \
+			--allocated-storage 20 \
+			--availability-zone <CafeInstance Availability Zone (us-west-2a)> \
+			--db-subnet-group-name "CafeDB Subnet Group" \
+			--vpc-security-group-ids <CafeDatabaseSG Group ID> \
+			--no-publicly-accessible \
+			--master-username root --master-user-password 'Re:Start!9'
+-check the status of the database: aws rds describe-db-instances \
+			--db-instance-identifier CafeDBInstance \
+			--query "DBInstances[*].[Endpoint.Address,AvailabilityZone,PreferredBackupWindow,BackupRetentionPeriod,DBInstanceStatus]"
+-Migrating application data to the Amazon RDS instance
+	-Connect to another Instance Database: mysqldump --user=root --password='Re:Start!9' \
+				--databases cafe_db --add-drop-database > cafedb-backup.sql
+	-review the contents of the backup file: less cafedb-backup.sql
+	-Next, you restore the backup to the Amazon RDS database by using the mysql command. You must specify the endpoint address of the Amazon RDS instance in the command:
+				mysql --user=root --password='Re:Start!9' \
+				--host=<RDS Instance Database Endpoint Address> \
+				< cafedb-backup.sql	
+	-connects you to the database on your RDS instance:
+				mysql --user=root --password='Re:Start!9' \
+				--host=<RDS Instance Database Endpoint Address> \
+				cafe_db
+				
+
+
+
+
+
